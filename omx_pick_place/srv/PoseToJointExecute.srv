@@ -1,0 +1,27 @@
+# Request
+geometry_msgs/PoseStamped target_pose
+
+# 0: IK only (return joint_state only)
+# 1: MoveIt plan+execute
+# 2: Direct controller (FollowJointTrajectory) - no planning
+# 3: 새 방식 constrained IK만 계산
+# 4: constrained IK + MoveIt plan/execute
+# 5: constrained IK + direct FJT execute
+
+int32 execute_mode
+float64 ik_timeout_sec
+float64 move_duration_sec
+
+float64 tool_pitch_sum
+float64 wrist_angle
+float64 position_tolerance
+string eval_link_name
+
+float64 tool_pitch_tolerance   # rad
+float64 wrist_tolerance        # rad
+
+---
+bool success
+string message
+sensor_msgs/JointState joint_state
+

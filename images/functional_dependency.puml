@@ -1,0 +1,94 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 10
+
+' =========================
+' 1. MASTER DATA
+' =========================
+package "1. Master Data" {
+
+entity "PILL\n(pill_id, pill_name, dosage)" as PILL
+note right of PILL
+FD:
+pill_id → pill_name, dosage
+end note
+
+entity "STATION\n(station_id, station_name, target_x, target_y, target_theta)" as ST
+note right of ST
+FD:
+station_id → station_name, target_x, target_y, target_theta
+end note
+
+entity "BOX\n(box_id, aruco_id, room_no)" as BOX
+note right of BOX
+FD:
+box_id → aruco_id, room_no
+end note
+}
+
+' =========================
+' 2. OPERATIONAL DATA
+' =========================
+package "2. Operational Data" {
+
+entity "PATIENT\n(patient_id, name, room_no, station_id)" as PAT
+note right of PAT
+FD:
+patient_id → name, room_no, station_id
+room_no → station_id  (⚠ Transitive)
+end note
+
+entity "DISPENSER\n(dispenser_id, pill_id, current_stock, target_x, target_y, target_theta)" as DISP
+note right of DISP
+FD:
+dispenser_id → pill_id, current_stock, target_x, target_y, target_theta
+end note
+}
+
+' =========================
+' 3. DELIVERY
+' =========================
+package "3. Delivery Transaction" {
+
+entity "ORDER\n(order_id, patient_id, box_id, status, created_at)" as ORD
+note right of ORD
+FD:
+order_id → patient_id, box_id, status, created_at
+end note
+
+entity "ORDER_DETAIL\n(order_id, pill_id, required_qty, sequence, is_collected)" as DET
+note right of DET
+FD:
+(order_id, pill_id) → required_qty, sequence, is_collected
+end note
+
+entity "DELIVERY_LOG\n(log_id, order_id, box_state, logged_at)" as LOG
+note right of LOG
+FD:
+log_id → order_id, box_state, logged_at
+end note
+}
+
+' =========================
+' 4. MEDICAL RECORD
+' =========================
+package "4. Medical Records" {
+
+entity "PRESCRIPTION\n(prescription_id, patient_id, pill_id, required_qty, schedule_time)" as PRE
+note right of PRE
+FD:
+prescription_id → patient_id, pill_id, required_qty, schedule_time
+pill_id → pill_name (⚠ Transitive)
+end note
+
+entity "HISTORY\n(history_id, patient_id, pill_id, taken_qty, taken_at)" as HIS
+note right of HIS
+FD:
+history_id → patient_id, pill_id, taken_qty, taken_at
+pill_id → pill_name (⚠ Transitive)
+end note
+}
+
+@enduml

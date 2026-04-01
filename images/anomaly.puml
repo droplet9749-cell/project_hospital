@@ -1,0 +1,34 @@
+@startuml
+skinparam linetype poly
+skinparam shadowing false
+skinparam defaultFontName "Pretendard", "Apple SD Gothic Neo", sans-serif
+skinparam roundcorner 12
+skinparam nodesep 60
+skinparam ranksep 60
+
+skinparam card {
+    BackgroundColor #FFFFFF
+    BorderColor #94A3B8
+    BorderThickness 1.5
+    FontColor #334155
+    FontSize 14
+    FontStyle bold
+}
+
+package " Patient  " {
+    
+    card "patient_id (X)" as x
+    card "room_no (Y)" as y
+    card "station_id (Z)" as z
+
+    ' X에서 Y로의 함수적 종속 (오른쪽으로 배치)
+    x -right-> y 
+
+    ' Z를 X 바로 아래에 강제 배치하기 위한 숨김 선
+    x -down[hidden]-> z
+
+    ' Y에서 Z로의 이행적 종속 (대각선으로 그려짐)
+    y --> z 
+    
+}
+@enduml

@@ -1,0 +1,81 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 12
+
+' =====================================
+' 0. 비정규 (문제 구조)
+' =====================================
+package "0. UNNORMALIZED" {
+
+entity "PRESCRIPTION_RAW\n(prescription_id, patient_id, pill_id, pill_name, required_qty, schedule_time)" as RAW
+
+note right of RAW
+FD:
+prescription_id → patient_id, pill_id, required_qty, schedule_time
+pill_id → pill_name   ⚠ Transitive Dependency
+end note
+}
+
+' =====================================
+' 1. 2NF (부분 종속 제거)
+' =====================================
+package "1. 2NF" {
+
+entity "PRESCRIPTION\n(prescription_id, patient_id, pill_id, required_qty, schedule_time)" as PRE_2NF
+
+entity "PILL\n(pill_id, pill_name)" as PILL_2NF
+
+note right of PRE_2NF
+FD:
+prescription_id → patient_id, pill_id, required_qty, schedule_time
+end note
+
+note right of PILL_2NF
+FD:
+pill_id → pill_name
+end note
+}
+
+RAW --> PRE_2NF : "분해"
+RAW --> PILL_2NF : "분해"
+
+' =====================================
+' 2. 3NF (이행적 종속 제거)
+' =====================================
+package "2. 3NF" {
+
+entity "PATIENT\n(patient_id, name, room_no, station_id)" as PAT_3NF
+
+entity "ROOM\n(room_no, station_id)" as ROOM_3NF
+
+note right of PAT_3NF
+FD:
+patient_id → name, room_no
+end note
+
+note right of ROOM_3NF
+FD:
+room_no → station_id
+end note
+}
+
+PAT_3NF --> ROOM_3NF : "이행 종속 제거"
+
+' =====================================
+' 3. BCNF (검증 단계)
+' =====================================
+package "3. BCNF CHECK" {
+
+entity "ORDER_DETAIL\n(order_id, pill_id, required_qty, sequence, is_collected)" as DET_BCNF
+
+note right of DET_BCNF
+FD:
+(order_id, pill_id) → required_qty, sequence, is_collected
+
+✔ 모든 결정자가 후보키 → BCNF 만족
+end note
+}
+
+@enduml

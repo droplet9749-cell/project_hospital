@@ -1,0 +1,147 @@
+@startuml
+' === 모던 미니멀리즘 스타일 설정 ===
+hide circle
+skinparam linetype ortho
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam nodesep 80
+skinparam ranksep 90
+skinparam Padding 6
+
+' 전체 통합 테마 (Tailwind CSS 스타일)
+skinparam class {
+    BackgroundColor #FFFFFF
+    HeaderBackgroundColor #F8FAFC
+    BorderColor #CBD5E1
+    BorderThickness 1.5
+    ArrowColor #6366F1
+    ArrowThickness 1.5
+    FontName "Pretendard", "Apple SD Gothic Neo", sans-serif
+    FontSize 15
+    HeaderFontColor #0F172A
+    FontColor #334155
+    AttributeFontSize 14
+    AttributeFontColor #475569
+}
+
+' ==========================================
+' 1. 기준 정보 (Master Data)
+' ==========================================
+entity "Station" {
+    **station_id** : varchar <<PK>>
+    --
+    station_name : varchar
+    target_x : float
+    target_y : float
+    target_theta : float
+}
+
+entity "Pill" {
+    **pill_id** : varchar <<PK>>
+    --
+    pill_name : varchar
+    dosage : varchar
+}
+
+entity "Box" {
+    **box_id** : varchar <<PK>>
+    --
+    aruco_id : int
+    room_no : varchar
+}
+
+' ==========================================
+' 2. 운영 정보 (Operational Data)
+' ==========================================
+entity "Patient" {
+    **patient_id** : varchar <<PK>>
+    --
+    name : varchar
+    room_no : varchar
+    station_id : varchar <<FK>>
+}
+
+entity "Dispenser" {
+    **dispenser_id** : varchar <<PK>>
+    --
+    pill_id : varchar <<FK>>
+    target_x : float
+    target_y : float
+    target_theta : float
+    current_stock : int
+}
+
+' ==========================================
+' 3. 배달 프로세스 (Delivery Transaction)
+' ==========================================
+entity "Delivery_Order" {
+    **order_id** : int <<PK>>
+    --
+    patient_id : varchar <<FK>>
+    box_id : varchar <<FK>>
+    status : varchar
+    created_at : timestamp
+}
+
+entity "Order_Detail" {
+    **order_id** : int <<PK, FK>>
+    **pill_id** : varchar <<PK, FK>>
+    --
+    required_qty : int
+    sequence : int
+    is_collected : int
+}
+
+entity "Monitoring_Log" {
+    **log_id** : int <<PK>>
+    --
+    order_id : int <<FK>>
+    box_state : tinyint
+    logged_at : timestamp
+}
+
+' ==========================================
+' 4. 의료 기록 (Medical Records)
+' ==========================================
+entity "Prescription" {
+    **prescription_id** : int <<PK>>
+    --
+    patient_id : varchar <<FK>>
+    pill_id : varchar <<FK>>
+    pill_name : varchar
+    required_qty : int
+    schedule_time : time
+}
+
+entity "Dose_History" {
+    **history_id** : int <<PK>>
+    --
+    patient_id : varchar <<FK>>
+    pill_id : varchar <<FK>>
+    pill_name : varchar
+    taken_qty : int
+    taken_at : datetime
+}
+
+' ==========================================
+' 관계 (Relationships)
+' ==========================================
+
+' 흐름을 깔끔하게 만들기 위해 상하/좌우 배치를 유도하는 방향 지정자(up, down, left, right) 생략 및 최적화
+Station ||..o{ Patient
+Pill ||..o{ Dispenser
+
+Patient ||..o{ Delivery_Order
+Box ||..o{ Delivery_Order
+Delivery_Order ||..o{ Monitoring_Log
+
+Patient ||..o{ Prescription
+Pill ||..o{ Prescription
+
+Patient ||..o{ Dose_History
+Pill ||..o{ Dose_History
+
+Delivery_Order ||--|{ Order_Detail
+Pill ||--o{ Order_Detail
+
+@enduml

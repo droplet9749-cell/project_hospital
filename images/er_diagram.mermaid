@@ -1,0 +1,110 @@
+erDiagram
+%% ==========================================
+%% 1. 기준 정보 (Master Data)
+%% ==========================================
+    Station {
+        varchar station_id PK
+        varchar station_name
+        float target_x
+        float target_y
+        float target_theta
+    }
+
+    Pill {
+        varchar pill_id PK
+        varchar pill_name
+        varchar dosage
+    }
+
+    Box {
+        varchar box_id PK
+        int aruco_id
+        varchar room_no
+    }
+
+%% ==========================================
+%% 2. 운영 정보 (Operational Data)
+%% ==========================================
+    Patient {
+        varchar patient_id PK
+        varchar name
+        varchar room_no
+        varchar station_id FK
+    }
+
+    Dispenser {
+        varchar dispenser_id PK
+        varchar pill_id FK
+        float target_x
+        float target_y
+        float target_theta
+        int current_stock
+    }
+
+%% ==========================================
+%% 3. 배달 프로세스 (Delivery Transaction)
+%% ==========================================
+    Delivery_Order {
+        int order_id PK
+        varchar patient_id FK
+        varchar box_id FK
+        varchar status
+        timestamp created_at
+    }
+
+    Order_Detail {
+        int order_id PK,FK
+        varchar pill_id PK,FK
+        int required_qty
+        int sequence
+        int is_collected
+    }
+
+    Monitoring_Log {
+        int log_id PK
+        int order_id FK
+        tinyint box_state
+        timestamp logged_at
+    }
+
+%% ==========================================
+%% 4. 의료 기록 (Medical Records)
+%% ==========================================
+    Prescription {
+        int prescription_id PK
+        varchar patient_id FK
+        varchar pill_id FK
+        varchar pill_name
+        int required_qty
+        time schedule_time
+    }
+
+    Dose_History {
+        int history_id PK
+        varchar patient_id FK
+        varchar pill_id FK
+        varchar pill_name
+        int taken_qty
+        datetime taken_at
+    }
+
+%% ==========================================
+%% 관계 (Relationships) - 렌더링 최적화 순서
+%% ==========================================
+    
+    %% 물리적 매핑
+    Station ||--o{ Patient : "소속"
+    Pill ||--o{ Dispenser : "보관"
+
+    %% 배달 트랜잭션 (중심 흐름)
+    Patient ||--o{ Delivery_Order : "주문 생성"
+    Box ||--o{ Delivery_Order : "상자 할당"
+    Delivery_Order ||--|{ Order_Detail : "상세 내역"
+    Pill ||--o{ Order_Detail : "약품 포함"
+    Delivery_Order ||--o{ Monitoring_Log : "상태 추적"
+
+    %% 의료/처방 이력 (측면 배치)
+    Patient ||--o{ Prescription : "처방 대상"
+    Pill ||--o{ Prescription : "처방 약품"
+    Patient ||--o{ Dose_History : "복용 주체"
+    Pill ||--o{ Dose_History : "복용 약품"

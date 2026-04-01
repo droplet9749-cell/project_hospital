@@ -1,0 +1,123 @@
+server:
+  url: "http://192.168.0.4:8000"
+  timeout: 3.0
+  check_interval: 5.0
+
+environment:
+  # 프로젝트 모형 전체 규격
+  model_size:
+    width: 1.835   # 1835mm
+    length: 1.870  # 1870mm
+
+  # 발표 장소 (타일형 그리드)
+  presentation_size:
+    tile_size: 0.45      # 450mm
+    grid_count_x: 9      # 가로 9칸
+    grid_count_y: 5      # 세로 5칸
+    total_width: 4.05    # 9칸 * 0.45m
+    total_length: 2.25   # 5칸 * 0.45m
+
+  # 장애물 및 구조물 규격
+  obstacles_size:
+    dispenser:
+      width: 0.15    # 150mm
+      length: 0.30   # 300mm
+      height: 0.40   # [임시] 디스펜서 출구 높이
+    wall_height: 0.60 # 폼보드 벽 높이 600mm
+    
+  # 스테이션의 규격 (환자 병실 앞 약 수령처)
+  station_size:
+    width: 0.34
+    length: 0.165
+    height: 0.163
+
+#0
+waypoints:
+  # 1. 초기 터틀봇 위치 (약제실 내 대기 장소)
+  home_point: {x: 0.0, y: 0.0, theta: 0.0}
+
+  # 2. 약 상자 보관 장소 (약제실 내부 보충용)
+  storage_point: {x: -0.30, y: -1.72, theta: 0.0}
+
+  # 3. 디스펜서 및 배달 상자 작업 테이블
+  dispenser_table_point: {x: 0.43, y: -0.05, theta: 3.14159}
+
+  # 4. 스테이션 위치 (배송 장소)
+  station_point:
+    "S001": {x: 0.12, y: -1.8, theta: 3.14}
+
+  # 5. 스테이션으로 가는 길 경유지
+  out_mid_points:
+    - {x: 0.0, y: 0.0, theta: 3.14}
+    - {x: -0.72, y: 0.0, theta: 3.14}
+    - {x: -0.88, y: -0.695, theta: -1.57}
+    - {x: 0.0, y: -0.745, theta: 0.0}
+
+  # 6. 스테이션에서 오는 길 경유지 
+  in_mid_points:
+    - {x: 0.4, y: -0.745, theta: 3.14}
+    - {x: -0.21, y: -0.86, theta: 3.14}
+    - {x: -0.85, y: -0.32, theta: 1.57}
+  
+  # 7. 약제실로 가는 길 경유지  
+  out_pill_point:
+    - {x: -0.72, y: 0.0, theta: 3.14}
+    - {x: -0.88, y: -0.695, theta: -1.57}
+
+  # 8. 약제실에서 오는 길 경유지  
+  in_pill_point:
+    - {x: -0.88, y: -0.695, theta: 1.57}
+    - {x: -0.72, y: 0.0, theta: 0.0}
+
+# 작업 영역(Workspace) 좌표들
+workspaces:
+  # 1. 배달 상자 영역
+  delivery_box_zone:
+    min: [0.0, -0.2, 0.0]
+    max: [0.3, 0.2, 0.2]
+  
+  # 2. 약 상자 영역
+  pill_box_zone:
+    min: [0.0, -0.2, 0.0]
+    max: [0.3, 0.2, 0.2]
+  
+  # 3. 디스펜서 마커 인식 영역
+  dispenser_watch_zone:
+    "D001": {min: [0.0, 0.1, 0.0], max: [0.15, 0.2, 0.2]}
+    "D002": {min: [0.0, -0.05, 0.0], max: [0.15, 0.05, 0.2]}
+
+
+  # 4. 디스펜서 약품 수령 영역 (센서 인식)
+  dispenser_sensor_in_zone:
+    "D001":
+      in_zone: {min: [0.0, 0.1, 0.0], max: [0.15, 0.2, 0.2]}
+      out_zone: {min: [0.0, 0.1, 0.0], max: [0.05, 0.2, 0.2]}
+    "D002":
+      in_zone: {min: [0.0, -0.05, 0.0], max: [0.15, 0.05, 0.2]}
+      out_zone: {min: [0.0, -0.05, 0.0], max: [0.05, 0.05, 0.2]}
+  
+  # 5. 디스펜서 센서 리셋 영역 (로봇 쪽으로 당김)
+  dispenser_sensor_out_zone:
+    min: [0.0, -0.1, 0.3]
+    max: [0.05, 0.1, 0.4]
+  
+  # 6. 환자 스테이션 하역/수거 영역
+  station_zone:
+    min: [0.1, -0.15, 0.163]
+    max: [0.25, 0.15, 0.20]
+
+# ArUco 마커 ID와 박스/약품 매핑 (비전 인식용)
+aruco_mapping:
+  boxes:
+    "Box_A": 10
+    "Box_B": 11
+    "Box_C": 12
+    "Box_D": 13
+  pills:
+    "M001": 0    # 타이레놀 상자
+    "M002": 1    # 탁센 상자
+  dispensers: # 디스펜서 본체 (20, 21번)
+    "D001": 20
+    "D002": 21
+
+marker_length_m: 0.028

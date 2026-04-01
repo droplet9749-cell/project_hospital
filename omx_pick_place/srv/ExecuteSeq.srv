@@ -1,0 +1,13 @@
+string execute_seq
+
+geometry_msgs/Point workspace_min
+geometry_msgs/Point workspace_max
+
+int32 target_box_id        # -1이면 valid한 첫 박스 자동 선택
+float64 camera_standoff_m  # 0이면 내부 기본값 사용
+
+---
+bool success
+string message
+int32 picked_box_id
+geometry_msgs/Point picked_point_link0

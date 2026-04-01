@@ -1,0 +1,11 @@
+geometry_msgs/Point workspace_min
+geometry_msgs/Point workspace_max
+
+float32 camera_standoff_m
+float32 settle_time_sec
+bool capture_debug_image
+---
+bool success
+string message
+geometry_msgs/Pose camera_target_pose_arm
+omx_pick_place/BoxDetection[] boxes

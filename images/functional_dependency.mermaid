@@ -1,0 +1,56 @@
+flowchart LR
+
+%% ── 스타일 클래스 정의 ──────────────────────────────
+classDef master  fill:#E8F4FD,stroke:#3D8EBF,stroke-width:2px,color:#0F172A,font-weight:bold
+classDef mid     fill:#FEF3F2,stroke:#E74C3C,stroke-width:2px,color:#0F172A,font-weight:bold
+classDef mid2    fill:#FDF4FF,stroke:#9B59B6,stroke-width:2px,color:#0F172A,font-weight:bold
+classDef txn     fill:#EFF6FF,stroke:#2980B9,stroke-width:3px,color:#0F172A,font-weight:bold
+classDef sub     fill:#F0FDF4,stroke:#1ABC9C,stroke-width:2px,color:#0F172A,font-weight:bold
+classDef sub2    fill:#FFF5F5,stroke:#E74C3C,stroke-width:2px,stroke-dasharray:4,color:#0F172A
+
+%% ── 관계(마름모) 스타일 ────────────────────────────
+classDef rel     fill:#FFFBEB,stroke:#F9A825,stroke-width:1.5px,color:#92400E
+
+%% ── 개체 노드 (직사각형) ───────────────────────────
+Station["Station<br/>배송 및 검수 지점"]:::master
+Pill["Pill<br/>환자 약"]:::master
+Box["Box<br/>상자"]:::master
+
+Patient["Patient<br/>환자"]:::mid
+Dispenser["Dispenser<br/>디스펜서"]:::mid2
+
+Delivery_Order["Delivery_Order<br/>배송 주문"]:::txn
+
+Order_Detail["Order_Detail<br/>처방 상세"]:::sub
+Monitoring_Log["Monitoring_Log<br/>복용 모니터링"]:::sub2
+
+%% ── 관계 노드 (마름모) ─────────────────────────────
+R1{배치}:::rel
+R2{보관}:::rel
+R3{주문 배정}:::rel
+R4{상자 사용}:::rel
+R5{처방 상세}:::rel
+R6{약품 구성}:::rel
+R7{상태 기록}:::rel
+
+%% ── 연결선 ─────────────────────────────────────────
+Station      --- R1
+R1           -->|"station_id (FK)"| Patient
+
+Pill         --- R2
+R2           -->|"pill_id (FK)"| Dispenser
+
+Patient      --- R3
+R3           -->|"patient_id (FK)"| Delivery_Order
+
+Box          --- R4
+R4           -->|"box_id (FK)"| Delivery_Order
+
+Delivery_Order --- R5
+R5           ==>|"order_id (FK, CASCADE)"| Order_Detail
+
+Pill         --- R6
+R6           ==>|"pill_id (FK)"| Order_Detail
+
+Delivery_Order --- R7
+R7           -->|"order_id (FK)"| Monitoring_Log
